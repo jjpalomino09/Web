@@ -1,12 +1,13 @@
 package edu.unimagdalena.lms.repositories;
 
 import edu.unimagdalena.lms.entities.Enrollment;
+import edu.unimagdalena.lms.entities.Instructor;
 import edu.unimagdalena.lms.entities.Student;
 import edu.unimagdalena.lms.entities.Course;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -48,6 +49,9 @@ class EnrollmentRepositoryTest {
     @Autowired
     private CourseRepository courseRepository;
 
+    @Autowired
+    private InstructorRepository instructorRepository;
+
     @Test
     void testCreateEnrollment() {
 
@@ -59,9 +63,18 @@ class EnrollmentRepositoryTest {
                         .build()
         );
 
+        Instructor instructor = instructorRepository.save(
+                Instructor.builder()
+                        .email("inst@test.com")
+                        .fullName("Instructor Test")
+                        .createdAt(Instant.now())
+                        .build()
+        );
+
         Course course = courseRepository.save(
                 Course.builder()
                         .title("Spring Boot")
+                        .instructor(instructor)
                         .build()
         );
 
@@ -88,9 +101,18 @@ class EnrollmentRepositoryTest {
                         .build()
         );
 
+        Instructor instructor = instructorRepository.save(
+                Instructor.builder()
+                        .email("find@instructor.com")
+                        .fullName("Find Instructor")
+                        .createdAt(Instant.now())
+                        .build()
+        );
+
         Course course = courseRepository.save(
                 Course.builder()
                         .title("Java")
+                        .instructor(instructor)
                         .build()
         );
 
@@ -119,9 +141,18 @@ class EnrollmentRepositoryTest {
                         .build()
         );
 
+        Instructor instructor = instructorRepository.save(
+                Instructor.builder()
+                        .email("updated@instructor.com")
+                        .fullName("Updated Instructor")
+                        .createdAt(Instant.now())
+                        .build()
+        );
+
         Course course = courseRepository.save(
                 Course.builder()
                         .title("Spring")
+                        .instructor(instructor)
                         .build()
         );
 
@@ -151,9 +182,18 @@ class EnrollmentRepositoryTest {
                         .build()
         );
 
+        Instructor instructor = instructorRepository.save(
+                Instructor.builder()
+                        .email("delete@instructor.com")
+                        .fullName("Delete Instructor")
+                        .createdAt(Instant.now())
+                        .build()
+        );
+
         Course course = courseRepository.save(
                 Course.builder()
                         .title("Database")
+                        .instructor(instructor)
                         .build()
         );
 
@@ -184,9 +224,18 @@ class EnrollmentRepositoryTest {
                         .build()
         );
 
+        Instructor instructor = instructorRepository.save(
+                Instructor.builder()
+                        .email("query@instructor.com")
+                        .fullName("Query Instructor")
+                        .createdAt(Instant.now())
+                        .build()
+        );
+
         Course course = courseRepository.save(
                 Course.builder()
                         .title("Testing")
+                        .instructor(instructor)
                         .build()
         );
 
