@@ -1,6 +1,8 @@
 package edu.unimagdalena.lms.services;
 
+import edu.unimagdalena.lms.entities.Course;
 import edu.unimagdalena.lms.entities.Enrollment;
+import edu.unimagdalena.lms.entities.Student;
 import edu.unimagdalena.lms.repositories.EnrollmentRepository;
 
 import org.junit.jupiter.api.Test;
@@ -10,10 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EnrollmentServiceTest {
@@ -21,42 +23,74 @@ class EnrollmentServiceTest {
     private EnrollmentRepository enrollmentRepository;
 
     @InjectMocks
-    private EnrollmentService enrollmentService;
+    private EnrollmentServiceImpl enrollmentService;
 
     @Test
-    void testEnrollStudent() {
+    void shouldSaveEnrollment() {
         Enrollment enrollment = Enrollment.builder()
-                .id(1L)
                 .status("ACTIVE")
+                .student(new Student())
+                .course(new Course())
                 .build();
 
         when(enrollmentRepository.save(any(Enrollment.class)))
                 .thenReturn(enrollment);
 
-        Enrollment saved = enrollmentService.enrollStudent(enrollment);
+        Enrollment result = enrollmentService.save(enrollment);
 
-        assertNotNull(saved);
-        assertEquals("ACTIVE", saved.getStatus());
+        assertNotNull(result);
+        assertEquals("ACTIVE", result.getStatus());
 
         verify(enrollmentRepository).save(enrollment);
     }
 
     @Test
-    void testFindEnrollmentsByStudent() {
+    void shouldThrowIfStudentIsNull() {
+        Enrollment enrollment = Enrollment.builder()
+                .status("ACTIVE")
+                .course(new Course())
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            enrollmentService.save(enrollment);
+        });
+
+        verify(enrollmentRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldFindById(){
         Enrollment enrollment = Enrollment.builder()
                 .id(1L)
                 .status("ACTIVE")
+                .student(new Student())
+                .course(new Course())
                 .build();
 
-        when(enrollmentRepository.findByStudentId(1L))
-                .thenReturn(List.of(enrollment));
+        when(enrollmentRepository.findById(1L))
+                .thenReturn(Optional.of(enrollment));
 
-        List<Enrollment> result =
-                enrollmentService.findEnrollmentsByStudent(1L);
+        Enrollment result = enrollmentService.findById(1L);
 
-        assertFalse(result.isEmpty());
-        assertEquals("ACTIVE", result.get(0).getStatus());
+        assertEquals("ACTIVE",  result.getStatus());
+    }
 
-        verify(enrollmentRepository).findByStudentId(1L);
+    @Test
+    void shouldThrowIfNotFound(){
+        when(enrollmentRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> {
+            enrollmentService.findById(1L);
+        });
+    }
+
+    @Test
+    void shouldDeleteEnrollment(){
+        when(enrollmentRepository.existsById(1L)).thenReturn(true);
+
+        enrollmentService.deleteById(1L);
+
+        verify(enrollmentRepository).deleteById(1L);
     }
 }

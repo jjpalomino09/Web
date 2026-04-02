@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface StudentService {
     Student save(Student student);
-    Optional<Student> findById(Long id);
+    Student findById(Long id);
     List<Student> findAll();
     void deleteById(Long id);
 }

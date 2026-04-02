@@ -1,6 +1,7 @@
 package edu.unimagdalena.lms.services;
 
 import edu.unimagdalena.lms.entities.Course;
+import edu.unimagdalena.lms.entities.Instructor;
 import edu.unimagdalena.lms.repositories.CourseRepository;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,43 +23,77 @@ class CourseServiceTest {
     private CourseRepository courseRepository;
 
     @InjectMocks
-    private CourseService courseService;
+    private CourseServiceImpl courseService;
 
     @Test
-    void testCreateCourse() {
+    void shouldSaveCourse() {
         Course course = Course.builder()
-                .id(1L)
                 .title("Mockito Course")
                 .active(true)
+                .instructor(new Instructor())
                 .build();
 
-        when(courseRepository.save(any(Course.class))).thenReturn(course);
+        when(courseRepository.save(any(Course.class)))
+                .thenReturn(course);
 
-        Course saved = courseService.createCourse(course);
+        Course result = courseService.save(course);
 
-        assertNotNull(saved);
-        assertEquals("Mockito Course", saved.getTitle());
+        assertNotNull(result);
+        assertEquals("Mockito Course", result.getTitle());
 
         verify(courseRepository).save(course);
     }
 
     @Test
-    void testFindActiveCourses() {
+    void shouldThrowIfTitleIsEmpty() {
+        Course course = Course.builder()
+                .instructor(new Instructor())
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            courseService.save(course);
+        });
+    }
+
+    @Test
+    void shouldFindById() {
         Course course = Course.builder()
                 .id(1L)
+                .title("Spring")
+                .instructor(new Instructor())
+                .build();
+
+        when(courseRepository.findById(1L))
+                .thenReturn(Optional.of(course));
+
+        Course result = courseService.findById(1L);
+
+        assertEquals("Spring", result.getTitle());
+    }
+
+    @Test
+    void shouldFindActiveCoursesByInstructor() {
+        Course course = Course.builder()
                 .title("Spring Boot")
                 .active(true)
+                .instructor(new Instructor())
                 .build();
 
         when(courseRepository.findByInstructorIdAndActiveTrue(1L))
                 .thenReturn(List.of(course));
 
-        List<Course> result = courseService.findActiveCourses(1L);
+        List<Course> result =
+                courseService.findByInstructorIdAndActiveTrue(1L);
 
         assertFalse(result.isEmpty());
-        assertEquals("Spring Boot", result.get(0).getTitle());
+    }
 
-        verify(courseRepository)
-                .findByInstructorIdAndActiveTrue(1L);
+    @Test
+    void shouldDeleteCourse(){
+        when(courseRepository.existsById(1L)).thenReturn(true);
+
+        courseService.deleteById(1L);
+
+        verify(courseRepository).deleteById(1L);
     }
 }

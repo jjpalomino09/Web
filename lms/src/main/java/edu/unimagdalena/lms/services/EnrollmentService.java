@@ -1,12 +1,11 @@
 package edu.unimagdalena.lms.services;
 
-import edu.unimagdalena.lms.entities.Student;
+import edu.unimagdalena.lms.entities.Enrollment;
 import java.util.List;
-import java.util.Optional;
 
 public interface EnrollmentService {
-    Student save(Student student);
-    Optional<Student> findById(Long id);
-    List<Student> findAll();
+    Enrollment save(Enrollment enrollment);
+    Enrollment findById(Long id);
+    List<Enrollment> findAll();
     void deleteById(Long id);
 }

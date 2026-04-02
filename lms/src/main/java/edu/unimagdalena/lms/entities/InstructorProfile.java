@@ -3,8 +3,6 @@ package edu.unimagdalena.lms.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
-
 @Entity
 @Table(name = "instructor_profile")
 @NoArgsConstructor
@@ -24,6 +22,4 @@ public class InstructorProfile {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "instructor_id", nullable = false)
     private Instructor instructor;
-
-
 }

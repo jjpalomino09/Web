@@ -3,9 +3,6 @@ package edu.unimagdalena.lms.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-import java.util.Set;
-
 @Entity
 @Table(name = "lesson")
 @NoArgsConstructor

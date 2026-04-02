@@ -7,56 +7,92 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class StudentServiceTest {
+class StudentServiceTest {
     @Mock
     private StudentRepository studentRepository;
 
     @InjectMocks
-    private StudentService studentService;
+    private StudentServiceImpl studentService;
 
     @Test
-    void testCreateStudent() {
+    void shouldSaveStudentSuccessfully(){
         Student student = Student.builder()
-                .id(1L)
-                .email("mock@email.com")
-                .fullName("Mock Student")
-                .createdAt(Instant.now())
+                .email("test@email.com")
+                .fullName("Victot Diaz")
                 .build();
 
-        when(studentRepository.save(any(Student.class))).thenReturn(student);
+        when(studentRepository.save(any(Student.class)))
+                .thenReturn(student);
 
-        Student saved = studentService.createStudent(student);
+        Student result = studentService.save(student);
 
-        assertNotNull(saved);
-        assertEquals("Mock Student", saved.getFullName());
+        assertNotNull(result);
+        assertEquals("Victot Diaz", result.getFullName());
 
         verify(studentRepository).save(student);
     }
 
     @Test
-    void testFindStudent() {
+    void shouldThrowExceptionWhenEmailIsNull(){
         Student student = Student.builder()
-                .id(1L)
-                .email("find@student.com")
-                .fullName("Find Student")
-                .createdAt(Instant.now())
+                .fullName("Victot Diaz")
                 .build();
 
-        when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
+        assertThrows(IllegalArgumentException.class, () -> {
+            studentService.save(student);
+        });
 
-        Optional<Student> result = studentService.findStudent(1L);
+        verify(studentRepository, never()).save(any());
+    }
 
-        assertTrue(result.isPresent());
-        assertEquals("Find Student", result.get().getFullName());
+    @Test
+    void shouldFindStudentById(){
+        Student student = Student.builder()
+                .id(1L)
+                .email("test@email.com")
+                .fullName("Victor Diaz")
+                .build();
+
+        when(studentRepository.findById(1L))
+                .thenReturn(Optional.of(student));
+
+        Student result = studentService.findById(1L);
+
+        assertEquals("Victor Diaz", result.getFullName());
 
         verify(studentRepository).findById(1L);
+    }
+
+    @Test
+    void shouldThrowExceptionIfStudentNotFound(){
+        when(studentRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> {
+            studentService.findById(1L);
+        });
+    }
+
+    @Test
+    void shouldDeleteStudent(){
+        when(studentRepository.existsById(1L)).thenReturn(true);
+
+        studentService.deleteById(1L);
+
+        verify(studentRepository).deleteById(1L);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingNonExistingStudent(){
+        when(studentRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(RuntimeException.class, () -> {
+            studentService.deleteById(1L);
+        });
     }
 }

@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface InstructorService {
     Instructor save(Instructor instructor);
-    Optional<Instructor> findById(Long id);
+    Instructor findById(Long id);
     List<Instructor> findAll();
     void deleteById(Long id);
 }
